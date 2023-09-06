@@ -1,0 +1,122 @@
+    <html>
+    <head>
+        <title id=> Cálculo de CDB e CDC </title>
+        <style>
+            body{
+                background-color: rgb(24, 20, 41);
+                color: azure;
+                font-family: 'Montserrat','Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            }
+            #resultado{
+                color: rgb(114, 193, 100);
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Simulador de CDB e CDC</h1>
+        </header>
+        <form id="formulario" action="#">
+
+            <h2> CDB </h2>
+
+            <div>
+                <label for="">Valor a ser investido : </label>
+                <input id="cx-Valor-investido" type="number" placeholder="(R$)">
+            </div>
+
+            <div>
+                <label for="">Taxa de juros anual do CDB : </label>
+                <input id="cx-taxa-cdb" type="number" placeholder="(Entre 1% e 20%)">
+            </div>
+
+            <div>
+                <label for="">Quando o dinheiro será sacado : </label>
+                <input id="cx-ano-de-vencimento" type="number" placeholder="(Ano)">
+            </div>
+
+            <h2> CDC </h2>
+
+            <p>Agora vamos ver quanto o banco lucraria emprestando o mesmo valor em um CDC</p>
+
+            <div>
+                <label for="">Taxa de juros Mensal do CDC : </label>
+                <input id="cx-taxa-cdc" type="number" placeholder="(Entre 1% e 17%)">
+            </div>
+
+            <div id="botoes">
+                <input type="reset" value="Limpar valores">
+                <input id="btn-calcular" onclick="botao_calcular()" type="submit" value="Calcular CDB e CDC">
+            </div>
+        </form>
+            <h2> Resultado da simulção : </h2>
+            <p id="resultado"></p>
+
+        <script>
+            function botao_calcular(){
+
+                //Pegar valores
+                const cx_Valor_investido = document.getElementById('cx-Valor-investido')
+                const cx_taxa_cdb = document.getElementById('cx-taxa-cdb')
+                const cx_ano_vencimento = document.getElementById('cx-ano-de-vencimento')
+                const cx_taxa_cdc = document.getElementById('cx-taxa-cdc')
+
+                const valor_investido = Number(cx_Valor_investido.value)
+                const taxa_cdb = Number(cx_taxa_cdb.value)
+                const ano_vencimento = Number(cx_ano_vencimento.value)
+                const taxa_cdc = Number(cx_taxa_cdc.value)
+
+                //Calculo CDB
+                const tempo_anos = (ano_vencimento - 2023)
+                const juros_cdb = calcular_juros_compostos(valor_investido,taxa_cdb,tempo_anos)
+                const total_a_receber_no_cdb = (valor_investido + juros_cdb)
+                const rendimento_percentual_cdb = (taxa_cdb * tempo_anos)
+
+                //Calculo CDC
+                const valor_do_emprestimo = valor_investido
+                const tempo_meses = tempo_anos * 12
+                const juros_cdc = calcular_juros_compostos(valor_do_emprestimo,taxa_cdc,tempo_meses)
+                const lucro_do_banco = (juros_cdc - juros_cdb)
+                const total_a_pagar_no_cdc = valor_do_emprestimo + juros_cdc
+                const valor_parcelas = total_a_pagar_no_cdc / tempo_meses
+                const percentual_total = (juros_cdc / valor_do_emprestimo) * 100 
+
+                //RESULTADO
+                const resultado = `
+                ________________________
+
+                > CDB
+                ________________________
+
+                Valor investido : ${valor_investido.toFixed(2)} R$
+                Juros do CDB    : ${juros_cdb.toFixed(2)} R$
+                Total a receber : ${total_a_receber_no_cdb.toFixed(2)} R$
+                Rendimento (%)  : ${rendimento_percentual_cdb.toFixed(2)} %
+                
+                _________________________
+
+                > CDC
+                _________________________
+                
+                Valor do emprestimo  : ${valor_do_emprestimo.toFixed(2)} R$
+                Juros do CDC         : ${juros_cdc.toFixed(2)} R$
+                CET                  : ${percentual_total.toFixed(2)} %
+                Total a pagar no CDC : ${total_a_pagar_no_cdc.toFixed(2)} R$
+                Valor das parcelas   : ${valor_parcelas.toFixed(2)} R$ em ${tempo_meses} Meses
+                Lucro do banco       : ${lucro_do_banco.toFixed(2)} R$`
+
+
+                //Funções
+
+                function calcular_juros_compostos(capital,taxa,tempo){
+                    const montante =  capital * (1 + (taxa / 100))** tempo
+                    
+                    return montante - capital
+                }
+
+                const elemento_resultado = document.getElementById('resultado')
+                elemento_resultado.innerText = resultado
+            }
+        </script>    
+    </body>
+    </html>

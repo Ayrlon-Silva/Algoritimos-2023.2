@@ -1,0 +1,157 @@
+<html>
+<head>
+    <title>Cartão de crédito</title>
+    <style>
+        body{
+            background-color: rgb(38, 9, 9);
+            color: white;
+            font-family: 'Montserrat','Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+        #resultado{
+                color: rgb(74, 166, 212);
+            }
+    </style>
+</head>
+<body>
+    <header>
+        <h1> Simulador de cartão de crédito</h1>
+    </header>
+    <form id="formulario"action="#">
+        <div>
+            <label for=""> Fatura do cartão : </label>
+            <input type="number" id="cx-valor-da-fatura" placeholder="(R$)">
+        </div>
+
+        <div>
+            <label for=""> Taxa mensal rotativo : </label>
+            <input type="number" id="cx-taxa-rotativo" placeholder="(%)">
+        </div>
+
+        <p>Plano de pagamento 1 : </p>
+
+        <div>
+            <label for=""> Valor a pagar :  </label>
+            <input type="number" id="cx-valor-a-pagar-p1" placeholder="(R$)">
+        </div>
+
+        <div>
+            <label for=""> Meses de atraso: </label>
+            <input type="number" id="cx-meses-atraso-p1" placeholder="Meses: ">
+        </div>
+
+        <p>Plano de pagamento 2 : </p>
+
+        <div>
+            <label for=""> Valor a pagar :  </label>
+            <input type="number" id="cx-valor-a-pagar-p2" placeholder="(R$)">
+        </div>
+
+        <div>
+            <label for=""> Meses de atraso: </label>
+            <input type="number" id="cx-meses-atraso-p2" placeholder="Meses: ">
+        </div>
+
+        <P></P>
+
+        <div id="botoes">
+            <input type="reset" value="Limpar valores">
+            <input id="btn-calcular" onclick="clique_botao_calcular()" type="submit" value="Calcular faturas">
+        </div>
+
+    </form>
+
+    <h2> Resultado da simulção : </h2>
+    <p id="resultado"></p>
+
+    <script>
+        function clique_botao_calcular(){
+            //obter valores
+            const total_fatura = obter_numero("cx-valor-da-fatura")
+            const taxa_rotativo = obter_numero("cx-taxa-rotativo")
+            const valor_a_pagar_p1 = obter_numero("cx-valor-a-pagar-p1")
+            const meses_atraso_p1 = obter_numero("cx-meses-atraso-p1")
+            const valor_a_pagar_p2 = obter_numero("cx-valor-a-pagar-p2")
+            const meses_atraso_p2 = obter_numero("cx-meses-atraso-p2")
+
+            //processamento
+            const pagamento_minimo = total_fatura * (20/100)
+
+            //p1
+            const valor_restante_de_p1 =total_fatura - valor_a_pagar_p1
+            const juros_p1 = juros_compostos(valor_restante_de_p1, taxa_rotativo, meses_atraso_p1)
+            const fatura_p1 = valor_restante_de_p1 + juros_p1
+            const crescimento_percentual_p1 = (juros_p1 / valor_restante_de_p1) * 100
+
+
+            //p2
+            const valor_restante_de_p2 =total_fatura - valor_a_pagar_p2
+            const juros_p2 = juros_compostos(valor_restante_de_p2, taxa_rotativo, meses_atraso_p2)
+            const fatura_p2 = valor_restante_de_p2 + juros_p2
+            const crescimento_percentual_p2 = (juros_p2 / valor_restante_de_p2) * 100
+
+
+            //saida
+            const resultado = `
+            Valor Total               : ${total_fatura.toFixed(2)} R$
+            Valor Mínimo de pagamento : ${pagamento_minimo.toFixed(2)} R$
+            __________________________
+
+            > Plano de pagamento 1 : 
+            __________________________
+
+            Fatura original   : ${total_fatura.toFixed(2)} R$
+            Valor Pago        : ${valor_a_pagar_p1.toFixed(2)} R$
+            Valor Restante    : ${valor_restante_de_p1.toFixed(2)} R$
+            A fatura em ${meses_atraso_p1} meses será de ${fatura_p1.toFixed(2)} R$
+            Juros da fatura   : ${juros_p1.toFixed(2)} R$
+            Aumento percentual: ${crescimento_percentual_p1.toFixed(2)} %
+
+            __________________________
+
+            > Plano de pagamento 2 : 
+            __________________________
+
+            Fatura original   : ${total_fatura.toFixed(2)} R$
+            Valor Pago        : ${valor_a_pagar_p2.toFixed(2)} R$
+            Valor Restante    : ${valor_restante_de_p2.toFixed(2)} R$
+            A fatura em ${meses_atraso_p2} meses será de ${fatura_p2.toFixed(2)} R$
+            Juros da fatura    : ${juros_p2.toFixed(2)} R$
+            Aumento percentual : ${crescimento_percentual_p2.toFixed(2)} %
+
+            `
+
+            //funções
+
+            function obter_valor(elemento_id){
+                const elemento = document.getElementById(elemento_id)
+                const valor = elemento.value
+                
+                return valor
+            }
+
+            function obter_numero(elemento_id){
+                const numero = Number(obter_valor(elemento_id))
+
+                return numero
+            }
+
+            function juros_compostos(valor, taxa, meses){
+                const valor_futuro = valor + juros_compostos(valor, taxa, meses)
+                
+                return valor_futuro
+            }
+
+            function juros_compostos(c, i, t){
+                const montante = c * (1 + i/100)**t
+                const juros = montante - c  
+                return juros
+            }
+
+            const elemento_resultado = document.getElementById('resultado')
+            elemento_resultado.innerText = resultado
+
+        }
+
+    </script>
+</body>
+</html>
